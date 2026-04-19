@@ -1,35 +1,47 @@
-// tests/cartTest.java
 package tests;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import Base.BaseTest;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import pages.Inventory;
 import pages.Login;
-import pages.cartItem;
 
-public class cartTest {
+import java.util.List;
 
-    public static void main(String[] args) {
+public class cartTest extends BaseTest {
 
-        WebDriver driver = new ChromeDriver();
-        driver.manage().window().maximize();
-
-        // 1. Login
+    // Scenario 2: add two products, verify cart badge
+    @Test
+    public void addTwoProducts_CartBadgeUpdates() {
         Login loginPage = new Login(driver);
-        loginPage.open();
         loginPage.login("standard_user", "secret_sauce");
 
-        // 2. Add 2 products
-        cartItem productsPage = new cartItem(driver);
-        productsPage.addTwoProducts();
+        Inventory inventoryPage = new Inventory(driver);
+        Assert.assertTrue(inventoryPage.isLoaded(), "Inventory page should be loaded");
 
-        // 3. Check cart badge
-        String badge = productsPage.getCartBadgeCount();
-        if (!"2".equals(badge)) {
-            throw new AssertionError("Expected cart badge 2 but was: " + badge);
-        }
-        System.out.println("PASS: Cart badge is 2");
+        inventoryPage.addFirstNProductsToCart(2);
 
-        // 4. Close browser at the end
-        driver.quit();
+        int badgeCount = inventoryPage.getCartBadgeCount();
+        Assert.assertEquals(badgeCount, 2, "Cart badge should show 2 items");
+    }
+
+    // Scenario 5: sort by price low->high, check first three
+    @Test
+    public void sortByPriceLowToHigh_VerifyFirstThreeAscending() {
+        Login loginPage = new Login(driver);
+        loginPage.login("standard_user", "secret_sauce");
+
+        Inventory inventoryPage = new Inventory(driver);
+        Assert.assertTrue(inventoryPage.isLoaded(), "Inventory page should be loaded");
+
+        inventoryPage.sortByPriceLowToHigh();
+
+        List<Double> firstThreePrices = inventoryPage.getFirstNPrices(3);
+        Assert.assertEquals(firstThreePrices.size(), 3, "Should get three prices");
+
+        Assert.assertTrue(firstThreePrices.get(0) <= firstThreePrices.get(1),
+                "First price should be <= second price");
+        Assert.assertTrue(firstThreePrices.get(1) <= firstThreePrices.get(2),
+                "Second price should be <= third price");
     }
 }
