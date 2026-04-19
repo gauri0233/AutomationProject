@@ -9,7 +9,7 @@ A complete QA automation suite built in **Java + Selenium WebDriver + TestNG** f
 | Type | URL |
 |------|-----|
 | Web App | https://www.saucedemo.com |
-| REST API | https://reqres.in |
+| REST API |[ https://reqres.in ](https://jsonplaceholder.typicode.com)|
 
 ---
 
